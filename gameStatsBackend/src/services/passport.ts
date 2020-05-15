@@ -2,10 +2,31 @@ import passport from "passport";
 import steamStrategy from "passport-steam";
 import twitchTvStrategy from "passport-twitchtv";
 import { keys } from "../../config/keys";
+import { User } from "../models/User";
 
 const { STEAM_CLIENT_ID, TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } = keys();
 
-passport.use(
+passport.serializeUser((user: string, cb) => {
+  cb(null, user);
+});
+
+passport.deserializeUser(async (id: string, cb) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        id,
+      },
+    });
+    console.log("deserialize");
+
+    cb(null, user);
+  } catch (e) {
+    console.log(e);
+    cb(null, null);
+  }
+});
+
+/*passport.use(
   new twitchTvStrategy(
     {
       clientID: TWITCH_CLIENT_ID,
@@ -21,21 +42,36 @@ passport.use(
       return [accessToken, refresToken, profile, done];
     }
   )
-);
+);*/
 
 passport.use(
   new steamStrategy(
     {
-      returnURL: "/auth/steam/return",
-      realm: "http://localhost:3000/",
+      returnURL: "http://localhost:5000/api/auth/steam/callback",
+      realm: "http://localhost:5000/",
       apiKey: STEAM_CLIENT_ID,
-      profile: true, // set to false to skip fetching data from the Steam Web API, removing need for API key
+      profile: true,
     },
-    (identifier: any, profile: any, done: any) => {
-      console.log(identifier);
-      console.log(profile);
-      console.log(done);
-      return [identifier, profile, done];
+    async (_identifier: string, profile: any, done: Function) => {
+      try {
+        let user = await User.findOne({
+          where: {
+            id: profile._json.steamid,
+          },
+        });
+
+        if (!user) {
+          user = await User.create({
+            id: profile._json.steamid,
+            username: profile._json.personaname,
+          });
+        }
+
+        done(null, profile);
+      } catch (error) {
+        console.log("Error querying user from db: ", error);
+        done(null, error);
+      }
     }
   )
 );

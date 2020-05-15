@@ -1,11 +1,25 @@
 import { Request, Response } from "express";
-import { get, controller } from "./decorators";
+import { get, controller, use } from "./decorators";
+import passport from "passport";
+import "../services/passport";
 
 @controller("/api/auth")
 class LoginController {
-  @get("/steam")
-  getSteamLogin(req: Request, res: Response) {
+  @get("/steam/callback")
+  @use(passport.authenticate("steam"))
+  getSteamCallback(req: Request, res: Response) {
+    console.log("STEAM CALLBACK");
     console.log(req.body);
-    console.log(res);
+    res.send();
+  }
+
+  @get("/steam")
+  @use(passport.authenticate("steam"))
+  getSteamLogin(_req: Request, _res: Response) {}
+
+  @get("/logout")
+  getLogout(req: Request, res: Response) {
+    req.session = undefined;
+    res.send();
   }
 }

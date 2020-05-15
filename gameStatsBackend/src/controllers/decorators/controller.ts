@@ -1,24 +1,32 @@
 import "reflect-metadata";
 import { AppRouter } from "../../AppRouter";
-import { Methods } from "./Methods";
+import { Methods } from "./enums/Methods";
+import { MetadataKeys } from "./enums/MetadataKeys";
 
 export const controller = (routePrefix: string) => {
   return (target: Function) => {
     const router = AppRouter.getInstance();
 
-    for (let key in target.prototype) {
+    for (let key in Object.getOwnPropertyDescriptors(target.prototype)) {
+      console.log(key);
       const routeHandler = target.prototype[key];
-
-      //Assign metadata of name 'path' in target.prototype in the specified key
-      const path = Reflect.getMetadata("path", target.prototype, key);
+      const path = Reflect.getMetadata(
+        MetadataKeys.path,
+        target.prototype,
+        key
+      );
       const method: Methods = Reflect.getMetadata(
-        "method",
+        MetadataKeys.method,
         target.prototype,
         key
       );
 
+      const middlewares =
+        Reflect.getMetadata(MetadataKeys.middleware, target.prototype, key) ||
+        [];
+
       if (path) {
-        router[method](routePrefix + path, routeHandler);
+        router[method](routePrefix + path, ...middlewares, routeHandler);
       }
     }
   };

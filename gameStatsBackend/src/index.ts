@@ -6,6 +6,7 @@ import connectPgSimple from "connect-pg-simple";
 //import Pool from "pg";
 import "./controllers/LoginController";
 import { AppRouter } from "./AppRouter";
+import sequelize from "./models/index";
 
 const app = express();
 
@@ -42,6 +43,23 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(AppRouter.getInstance());
+
+sequelize.sync().then(async () => {
+  await sequelize.query(
+    `
+    CREATE TABLE IF NOT EXISTS "session" (
+      "sid" varchar NOT NULL COLLATE "default" PRIMARY KEY NOT DEFERRABLE INITIALLY IMMEDIATE,
+      "sess" json NOT NULL,
+      "expire" timestamp(6) NOT NULL
+    )
+    WITH (OIDS=FALSE);
+    `
+  );
+
+  await sequelize.query(
+    `CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");`
+  );
+});
 
 app.listen(5000, () => {
   console.log("started");

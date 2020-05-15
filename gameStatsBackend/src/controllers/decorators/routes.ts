@@ -1,11 +1,17 @@
 import "reflect-metadata";
-import { Methods } from "./Methods";
+import { Methods } from "./enums/Methods";
+import { MetadataKeys } from "./enums/MetadataKeys";
+import { RequestHandler } from "express";
+
+interface RouteHandlerDescriptor extends PropertyDescriptor {
+  value?: RequestHandler;
+}
 
 const routeBinder = (method: string) => {
   return (path: string) => {
-    return (target: any, key: string, desc: PropertyDescriptor) => {
-      Reflect.defineMetadata("path", path, target, key);
-      Reflect.defineMetadata("method", method, target, key);
+    return (target: any, key: string, _desc: RouteHandlerDescriptor) => {
+      Reflect.defineMetadata(MetadataKeys.path, path, target, key);
+      Reflect.defineMetadata(MetadataKeys.method, method, target, key);
     };
   };
 };
