@@ -8,7 +8,6 @@ export const controller = (routePrefix: string) => {
     const router = AppRouter.getInstance();
 
     for (let key in Object.getOwnPropertyDescriptors(target.prototype)) {
-      console.log(key);
       const routeHandler = target.prototype[key];
       const path = Reflect.getMetadata(
         MetadataKeys.path,

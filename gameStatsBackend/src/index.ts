@@ -5,6 +5,7 @@ import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 //import Pool from "pg";
 import "./controllers/LoginController";
+import "./controllers/GamesController";
 import { AppRouter } from "./AppRouter";
 import sequelize from "./models/index";
 
