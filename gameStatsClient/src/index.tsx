@@ -9,6 +9,10 @@ import { rootReducer } from "./reducers";
 import { Provider } from "react-redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { rootSaga } from "./sagas";
+import { BrowserRouter } from "react-router-dom";
+
+import Theme from "./Theme/Theme";
+import { ThemeProvider } from "@material-ui/core";
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
@@ -19,11 +23,15 @@ const store = createStore(
 sagaMiddleware.run(rootSaga);
 
 ReactDOM.render(
-  <Provider store={store}>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </Provider>,
+  <React.StrictMode>
+    <Provider store={store}>
+      <ThemeProvider theme={Theme}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ThemeProvider>
+    </Provider>
+  </React.StrictMode>,
   document.getElementById("root")
 );
 
