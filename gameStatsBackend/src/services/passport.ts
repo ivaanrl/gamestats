@@ -67,7 +67,7 @@ passport.use(
           });
         }
 
-        done(null, profile);
+        done(null, profile._json.steamid);
       } catch (error) {
         console.log("Error querying user from db: ", error);
         done(null, error);

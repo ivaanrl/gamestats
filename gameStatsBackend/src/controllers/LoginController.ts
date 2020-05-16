@@ -22,4 +22,9 @@ class LoginController {
     req.session = undefined;
     res.send();
   }
+
+  @get("/current_user")
+  getCurrentUser(req: Request, res: Response) {
+    res.send(req.user);
+  }
 }

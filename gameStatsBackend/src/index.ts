@@ -22,6 +22,8 @@ const corsOptions = {
 //});
 
 app.use(cors(corsOptions));
+app.options("*", cors());
+
 app.use(express.json());
 
 app.use(
@@ -29,7 +31,7 @@ app.use(
     //store: new (connectPgSimple(session))({
     //pool,
     //}),
-    secret: "cats",
+    secret: "catsaremean",
     resave: false,
     saveUninitialized: false,
     cookie: {
