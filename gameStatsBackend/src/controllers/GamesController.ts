@@ -68,26 +68,30 @@ const getGameCurrentPlayers = async (
     currentPlayers: number;
   }[] = [];
 
-  await Promise.all(
-    gameList.map(async (game) => {
-      if (game.name.toLowerCase().includes(searchedGame)) {
-        await request(
-          steamURLS.getGameCurrentPlayers + game.appid,
-          { json: true },
-          (err, _res, body) => {
-            if (err) {
-              console.log(err);
-            } else {
-              searchResult.push({
-                ...game,
-                currentPlayers: body.response.player_count,
-              });
+  try {
+    await Promise.all(
+      gameList.map(async (game) => {
+        if (game.name.toLowerCase().includes(searchedGame)) {
+          await request(
+            steamURLS.getGameCurrentPlayers + game.appid,
+            { json: true },
+            (err, _res, body) => {
+              if (err) {
+                console.log(err);
+              } else {
+                searchResult.push({
+                  ...game,
+                  currentPlayers: body.response.player_count,
+                });
+              }
             }
-          }
-        );
-      }
-    })
-  );
+          );
+        }
+      })
+    );
+  } catch (error) {
+    console.log(error);
+  }
   return searchResult;
 };
 
@@ -221,7 +225,7 @@ const getGameDetails = async (
     twitchId: string | null;
     twitchName: string | null;
     twitch_box_art_url: string | null;
-    view_count: number;
+    view_count: number | null;
   }[]
 ) => {
   const finalSearchResult: {
@@ -231,7 +235,7 @@ const getGameDetails = async (
     twitchId: string | null;
     twitchName: string | null;
     twitch_box_art_url: string | null;
-    view_count: number;
+    view_count: number | null;
     appdetails: gameDetails;
   }[] = [];
   try {
@@ -244,7 +248,16 @@ const getGameDetails = async (
             if (err) {
               console.log(err);
             } else {
-              finalSearchResult.push({ ...game, appdetails: body });
+              console.log(body[game.appid].data);
+              if (
+                body[game.appid].data !== undefined &&
+                body[game.appid].data.type == "game"
+              ) {
+                finalSearchResult.push({
+                  ...game,
+                  appdetails: body[game.appid].data,
+                });
+              }
             }
           }
         );
@@ -355,7 +368,7 @@ const getCurrentViewers = async (
     twitchId: string | null;
     twitchName: string | null;
     twitch_box_art_url: string | null;
-    view_count: number;
+    view_count: number | null;
   }[] = [];
   await Promise.all(
     gameList.map(async (game) => {
@@ -397,6 +410,8 @@ const getCurrentViewers = async (
         } catch (error) {
           console.log(error);
         }
+      } else {
+        gamesWithViewCount.push({ ...game, view_count: null });
       }
     })
   );
