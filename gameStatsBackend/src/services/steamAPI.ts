@@ -2,10 +2,64 @@ import { steamURLS } from "../../config/steamUrls";
 import request from "request-promise";
 import { sleep } from "../shared/sleep";
 import { keys } from "../../config/keys";
+import { topStreamsWithNameInterface } from "./twitchAPI";
 
 const { STEAM_CLIENT_ID } = keys();
 
-export const getGameCurrentPlayers = async (
+export const getListOfAllGames = async () => {
+  let gameList: { appid: number; name: string }[] = [];
+
+  await request(
+    steamURLS.getGamesAppIDsAndNames,
+    { json: true },
+    (err, _res, body) => {
+      if (err) {
+        console.log(err);
+      } else {
+        gameList = body.applist.apps;
+      }
+    }
+  );
+
+  return gameList;
+};
+
+export const getGamesCurrentPlayers = async (
+  gameList: topStreamsWithNameInterface
+) => {
+  const gameListWithInfo: any = [];
+
+  const allSteamGames = await getListOfAllGames();
+
+  const twitchIdAndGameName: { [name: string]: string }[] = [];
+
+  for (const game in gameList) {
+    twitchIdAndGameName.push({ [gameList[game].twitch_name]: game });
+  }
+
+  try {
+    await Promise.all(
+      allSteamGames.map(async (game) => {
+        if (game.name in Object.keys(twitchIdAndGameName)) {
+          const index: number = Object.keys(twitchIdAndGameName).indexOf(
+            game.name
+          );
+          const gameToEdit = Object.keys(gameList)[index];
+          gameListWithInfo.push({
+            ...gameList[gameToEdit],
+            steam_appId: game.appid,
+          });
+        }
+      })
+    );
+  } catch (error) {
+    console.log(error);
+  }
+
+  console.log(gameListWithInfo);
+};
+
+export const getSearchedGamesCurrentPlayers = async (
   gameList: { appid: number; name: string }[],
   searchedGame: string
 ) => {
