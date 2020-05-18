@@ -31,6 +31,7 @@ class GamesController {
         }
       }
     );
+
     const searchedGames = await getGameCurrentPlayers(gameList, searchedGame);
 
     const searchedGamesWithTwitchInfo = await getTwitchGamesIdByName(
@@ -47,13 +48,11 @@ class GamesController {
       searchedGamesWithTwitchViewCount
     );
 
-    //FINAL RESULT SORT
+    //FINAL RESULT SORT by current players on steam
 
     finalSearchResult.sort((a, b) => {
       return b.currentPlayers - a.currentPlayers;
     });
-
-    //console.log(searchedGames);
     res.json(finalSearchResult);
   }
 }
@@ -72,27 +71,31 @@ const getGameCurrentPlayers = async (
     await Promise.all(
       gameList.map(async (game) => {
         if (game.name.toLowerCase().includes(searchedGame)) {
-          await request(
-            steamURLS.getGameCurrentPlayers + game.appid,
-            { json: true },
-            (err, _res, body) => {
-              if (err) {
-                console.log(err);
-              } else {
-                searchResult.push({
-                  ...game,
-                  currentPlayers: body.response.player_count,
-                });
-              }
-            }
-          );
+          const options = {
+            uri: steamURLS.getGameCurrentPlayers + game.appid,
+            json: true,
+          };
+
+          const response = await request(options);
+          searchResult.push({
+            appid: game.appid,
+            name: game.name.replace(/\W+/g, " "),
+            currentPlayers: response.response.player_count,
+          });
         }
       })
     );
   } catch (error) {
-    console.log(error);
+    console.log("There was an error getting the game info.");
   }
+
+  //Need to find better solution
+  await sleep(500); //makes server wait until requests to Steam API are solved.
   return searchResult;
+};
+
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 export interface gameDetails {
@@ -248,7 +251,6 @@ const getGameDetails = async (
             if (err) {
               console.log(err);
             } else {
-              console.log(body[game.appid].data);
               if (
                 body[game.appid].data !== undefined &&
                 body[game.appid].data.type == "game"
@@ -264,7 +266,7 @@ const getGameDetails = async (
       })
     );
   } catch (error) {
-    //console.log(error.message);
+    console.log(error);
   }
   return finalSearchResult;
 };
