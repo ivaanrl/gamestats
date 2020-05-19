@@ -37,8 +37,8 @@ export const getTwitchGamesIdByName = async (
     appid: number;
     name: string;
     currentPlayers: number;
-    twitchId: string | null;
-    twitchName: string | null;
+    twitch_id: string | null;
+    twitch_name: string | null;
     twitch_box_art_url: string | null;
   }[] = [];
 
@@ -66,15 +66,15 @@ export const getTwitchGamesIdByName = async (
         if (response.data[0] === undefined) {
           gameListWithTwitchInfo.push({
             ...game,
-            twitchId: null,
-            twitchName: null,
+            twitch_id: null,
+            twitch_name: null,
             twitch_box_art_url: null,
           });
         } else {
           gameListWithTwitchInfo.push({
             ...game,
-            twitchId: response.data[0].id,
-            twitchName: response.data[0].name,
+            twitch_id: response.data[0].id,
+            twitch_name: response.data[0].name,
             twitch_box_art_url: response.data[0].box_art_url,
           });
         }
@@ -117,7 +117,7 @@ export const getTopStreams = async (twitchAppId: string) => {
       }
     } else {
       topStreams[response.data[stream].game_id] = {
-        game_id: response.data[stream].game_id,
+        twitch_id: response.data[stream].game_id,
         viewer_count: response.data[stream].viewer_count,
         thumbnail_url: response.data[stream].thumbnail_url,
         top_streamer: {
@@ -133,7 +133,7 @@ export const getTopStreams = async (twitchAppId: string) => {
 
 export interface topStreamsInterface {
   [appid: string]: {
-    game_id: string;
+    twitch_id: string;
     viewer_count: string;
     thumbnail_url: string;
     top_streamer: {
@@ -145,7 +145,7 @@ export interface topStreamsInterface {
 
 export interface topStreamsWithNameInterface extends topStreamsInterface {
   [appid: string]: {
-    game_id: string;
+    twitch_id: string;
     viewer_count: string;
     thumbnail_url: string;
     top_streamer: {
@@ -181,10 +181,12 @@ export const getGameById = async (
       }[];
     } = await request(options);
 
-    gameListWithNames[appid] = {
-      ...gameList[appid],
-      twitch_name: response.data[0].name,
-    };
+    if (response.data[0] !== undefined) {
+      gameListWithNames[appid] = {
+        ...gameList[appid],
+        twitch_name: response.data[0].name,
+      };
+    }
   }
 
   return gameListWithNames;
@@ -195,8 +197,8 @@ export const getCurrentViewers = async (
     appid: number;
     name: string;
     currentPlayers: number;
-    twitchId: string | null;
-    twitchName: string | null;
+    twitch_id: string | null;
+    twitch_name: string | null;
     twitch_box_art_url: string | null;
   }[],
   twitchAppId: string
@@ -205,17 +207,17 @@ export const getCurrentViewers = async (
     appid: number;
     name: string;
     currentPlayers: number;
-    twitchId: string | null;
-    twitchName: string | null;
+    twitch_id: string | null;
+    twitch_name: string | null;
     twitch_box_art_url: string | null;
-    view_count: number | null;
+    viewer_count: number | null;
   }[] = [];
   await Promise.all(
     gameList.map(async (game) => {
       let totalViewCount = 0;
       const options = {
         method: "GET",
-        uri: twitchURLS.getStreams + `?game_id=${game.twitchId}`,
+        uri: twitchURLS.getStreams + `?game_id=${game.twitch_id}`,
         headers: {
           Authorization: `Bearer ${twitchAppId}`,
           "Client-ID": TWITCH_CLIENT_ID,
@@ -224,7 +226,7 @@ export const getCurrentViewers = async (
         json: true,
       };
 
-      if (game.twitchId !== null) {
+      if (game.twitch_id !== null) {
         try {
           const response: { data: twitchStreamInterface[] } = await request(
             options
@@ -234,12 +236,12 @@ export const getCurrentViewers = async (
             totalViewCount += parseInt(response.data[stream].viewer_count, 10);
           }
 
-          gamesWithViewCount.push({ ...game, view_count: totalViewCount });
+          gamesWithViewCount.push({ ...game, viewer_count: totalViewCount });
         } catch (error) {
           console.log(error);
         }
       } else {
-        gamesWithViewCount.push({ ...game, view_count: null });
+        gamesWithViewCount.push({ ...game, viewer_count: null });
       }
     })
   );

@@ -1,7 +1,5 @@
 import { controller, get } from "./decorators";
-import e, { Request, Response } from "express";
-import request from "request-promise";
-import { steamURLS } from "../../config/steamUrls";
+import { Request, Response } from "express";
 import {
   getSearchedGamesCurrentPlayers,
   getGameDetails,
@@ -59,7 +57,7 @@ class GamesController {
   }
 
   @get("/topGames")
-  async getTopGames(req: Request, res: Response) {
+  async getTopGames(_req: Request, res: Response) {
     let twitchAppId: string = "";
     await getTwitchAppId().then((res) => {
       twitchAppId = res;
@@ -75,5 +73,24 @@ class GamesController {
     const topStreamsWithCurrentPlayers = await getGamesCurrentPlayers(
       topStreamsWithName
     );
+
+    const finalTopStreams = await getGameDetails(topStreamsWithCurrentPlayers);
+
+    finalTopStreams.sort((a, b) => {
+      let a_viewier_count = 0;
+      let b_viewier_count = 0;
+
+      if (a.viewer_count) {
+        a_viewier_count = a.viewer_count as number;
+      }
+
+      if (b.viewer_count) {
+        b_viewier_count = b.viewer_count as number;
+      }
+
+      return b_viewier_count - a_viewier_count;
+    });
+
+    res.json(finalTopStreams);
   }
 }

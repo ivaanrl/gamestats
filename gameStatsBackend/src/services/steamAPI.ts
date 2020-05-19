@@ -24,30 +24,56 @@ export const getListOfAllGames = async () => {
   return gameList;
 };
 
+const getGameCurrentPlayers = async (gameAppId: number) => {
+  const options = {
+    uri: steamURLS.getGameCurrentPlayers + gameAppId,
+    json: true,
+  };
+
+  return await request(options);
+};
+
 export const getGamesCurrentPlayers = async (
   gameList: topStreamsWithNameInterface
 ) => {
-  const gameListWithInfo: any = [];
+  const gameListWithInfo: {
+    twitch_id: string;
+    viewer_count: string;
+    thumbnail_url: string;
+    top_streamer: { viewer_count: string; streamer_id: string };
+    twitch_name: string;
+    appid: number;
+    currentPlayers: number;
+    name: string;
+  }[] = [];
 
   const allSteamGames = await getListOfAllGames();
 
-  const twitchIdAndGameName: { [name: string]: string }[] = [];
+  const twitchIdAndGameName: { [name: string]: string } = {};
 
   for (const game in gameList) {
-    twitchIdAndGameName.push({ [gameList[game].twitch_name]: game });
+    twitchIdAndGameName[gameList[game].twitch_name.toLowerCase()] =
+      gameList[game].twitch_id;
   }
 
   try {
     await Promise.all(
       allSteamGames.map(async (game) => {
-        if (game.name in Object.keys(twitchIdAndGameName)) {
-          const index: number = Object.keys(twitchIdAndGameName).indexOf(
-            game.name
+        if (
+          Object.keys(twitchIdAndGameName).includes(game.name.toLowerCase())
+        ) {
+          const index: string = twitchIdAndGameName[game.name.toLowerCase()];
+          const gameToEdit = gameList[index];
+
+          const currentPlayersResponse = await getGameCurrentPlayers(
+            game.appid
           );
-          const gameToEdit = Object.keys(gameList)[index];
+
           gameListWithInfo.push({
-            ...gameList[gameToEdit],
-            steam_appId: game.appid,
+            ...gameToEdit,
+            appid: game.appid,
+            currentPlayers: currentPlayersResponse.response.player_count,
+            name: game.name,
           });
         }
       })
@@ -56,7 +82,7 @@ export const getGamesCurrentPlayers = async (
     console.log(error);
   }
 
-  console.log(gameListWithInfo);
+  return gameListWithInfo;
 };
 
 export const getSearchedGamesCurrentPlayers = async (
@@ -73,12 +99,8 @@ export const getSearchedGamesCurrentPlayers = async (
     await Promise.all(
       gameList.map(async (game) => {
         if (game.name.toLowerCase().includes(searchedGame)) {
-          const options = {
-            uri: steamURLS.getGameCurrentPlayers + game.appid,
-            json: true,
-          };
+          const response = await getGameCurrentPlayers(game.appid);
 
-          const response = await request(options);
           searchResult.push({
             appid: game.appid,
             name: game.name.replace(/\W+/g, " "),
@@ -92,7 +114,7 @@ export const getSearchedGamesCurrentPlayers = async (
   }
 
   //Need to find better solution
-  await sleep(500); //makes server wait until requests to Steam API are solved.
+  await sleep(600); //makes server wait until requests to Steam API are solved.
   return searchResult;
 };
 
@@ -223,20 +245,24 @@ export const getGameDetails = async (
     appid: number;
     name: string;
     currentPlayers: number;
-    twitchId: string | null;
-    twitchName: string | null;
-    twitch_box_art_url: string | null;
-    view_count: number | null;
+    twitch_id: string | null;
+    twitch_name: string | null;
+    twitch_box_art_url?: string | null;
+    viewer_count: number | string | null;
+    thumbnail_url?: string;
+    top_streamer?: { viewer_count: string; streamer_id: string };
   }[]
 ) => {
   const finalSearchResult: {
     appid: number;
     name: string;
     currentPlayers: number;
-    twitchId: string | null;
-    twitchName: string | null;
-    twitch_box_art_url: string | null;
-    view_count: number | null;
+    twitch_id: string | null;
+    twitch_name: string | null;
+    twitch_box_art_url?: string | null;
+    viewer_count: number | string | null;
+    thumbnail_url?: string;
+    top_streamer?: { viewer_count: string; streamer_id: string };
     appdetails: gameDetails;
   }[] = [];
   try {
@@ -266,5 +292,6 @@ export const getGameDetails = async (
   } catch (error) {
     console.log(error);
   }
+
   return finalSearchResult;
 };
