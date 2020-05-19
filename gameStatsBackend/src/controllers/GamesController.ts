@@ -56,7 +56,7 @@ class GamesController {
     res.json(finalSearchResult);
   }
 
-  @get("/topGames")
+  @get("/topStreams")
   async getTopGames(_req: Request, res: Response) {
     let twitchAppId: string = "";
     await getTwitchAppId().then((res) => {
