@@ -1,6 +1,6 @@
 import { all, fork } from "redux-saga/effects";
-import { watchGetMostPlayed } from "../reducers/steam.reducer";
+import { watchGetTopStreams } from "../reducers/games.sagas";
 
 export const rootSaga = function* root() {
-  yield all([fork(watchGetMostPlayed)]);
+  yield all([fork(watchGetTopStreams)]);
 };

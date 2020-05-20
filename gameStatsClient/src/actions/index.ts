@@ -1,7 +1,8 @@
-import { getMostPlayed } from "./steam";
+import { getTopStreams, getTopStreamsCompletedAction } from "./games";
 
 const allActions = {
-  getMostPlayed,
+  getTopStreams,
+  getTopStreamsCompletedAction,
 };
 
 export default allActions;
