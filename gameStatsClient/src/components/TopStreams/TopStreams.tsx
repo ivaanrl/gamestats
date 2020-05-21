@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
-      marginTop: "20px",
+      marginTop: "80px",
     },
     isLoading: { marginTop: "20px" },
   })
@@ -41,7 +41,7 @@ const TopStreams = () => {
   }, [topStreams]);
 
   return (
-    <Container maxWidth="xl" className={classes.container}>
+    <Container maxWidth="lg" className={classes.container}>
       {isLoading ? (
         <CircularProgress color="secondary" className={classes.isLoading} />
       ) : null}

@@ -1,5 +1,4 @@
 import React from "react";
-import Paper from "@material-ui/core/Paper";
 import { gameDetails } from "../../reducers/games.reducer";
 import {
   makeStyles,
@@ -13,7 +12,9 @@ import {
   CardActions,
   Button,
 } from "@material-ui/core";
-import classes from "*.module.css";
+import { useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import allActions from "../../actions";
 
 export interface GamePreviewProps {
   appid: number;
@@ -36,9 +37,12 @@ export interface GamePreviewProps {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      flexBasis: "20%",
+      flexBasis: "90%",
       marginRight: "20px",
       marginBottom: "20px",
+      [theme.breakpoints.up("md")]: {
+        flexBasis: "30%",
+      },
     },
     name: {
       lineHeight: "1.5em",
@@ -53,8 +57,9 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     shortDescription: {
-      height: "100px",
-      maxHeight: "100px",
+      display: "block",
+      height: "80px",
+      maxHeight: "80px",
       overflow: "hidden",
       scrollbarWidth: "none",
       msOverflowStyle: "none",
@@ -86,17 +91,30 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: "7px",
       borderRadius: "5px",
     },
+    cardActions: {
+      display: "flex",
+      justifyContent: "flex-end",
+      paddingRight: "20px",
+      borderTop: `1px solid ${theme.palette.primary.light}`,
+    },
   })
 );
 
 const GamePreview = (props: GamePreviewProps) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const history = useHistory();
   const { name, currentPlayers, twitch_name, viewer_count, appdetails } = props;
 
   const { header_image, short_description } = appdetails;
 
+  const handleClick = () => {
+    dispatch(allActions.addGameInfo(props));
+    history.push("/gameInfo/" + name.replace(/ /g, "+"));
+  };
+
   return (
-    <Card className={classes.root}>
+    <Card className={classes.root} onClick={handleClick}>
       <CardActionArea>
         <CardMedia
           component="img"
@@ -129,22 +147,29 @@ const GamePreview = (props: GamePreviewProps) => {
                 Current players
               </Typography>
               <Typography variant="body2" color="secondary" component="p">
-                {currentPlayers}
+                {currentPlayers.toLocaleString()}
               </Typography>
             </div>
-            <div className={classes.currentViewers}>
-              <Typography variant="body2" color="textPrimary" component="p">
-                Current viewers
-              </Typography>
-              <Typography variant="body2" color="error" component="p">
-                {viewer_count}
-              </Typography>
-            </div>
+            {viewer_count !== null ? (
+              <div className={classes.currentViewers}>
+                <Typography variant="body2" color="textPrimary" component="p">
+                  Current viewers
+                </Typography>
+                <Typography variant="body2" color="error" component="p">
+                  {viewer_count.toLocaleString()}
+                </Typography>
+              </div>
+            ) : null}
           </div>
         </CardContent>
       </CardActionArea>
-      <CardActions>
-        <Button size="small" color="secondary" variant="outlined">
+      <CardActions className={classes.cardActions}>
+        <Button
+          size="small"
+          color="secondary"
+          variant="outlined"
+          onClick={handleClick}
+        >
           Learn More
         </Button>
       </CardActions>
