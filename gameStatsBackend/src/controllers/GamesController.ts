@@ -24,7 +24,7 @@ class GamesController {
       twitchAppId = res;
     });
 
-    const searchedGame = req.params.gameName.replace("+", " ").toLowerCase();
+    const searchedGame = req.params.gameName.replace(/+/g, " ").toLowerCase();
 
     const gameList = await getListOfAllGames();
 
