@@ -1,0 +1,14 @@
+.carousel-root {
+  background-color: #101f27;
+  padding: 15px;
+  padding-bottom: 0px;
+  border-radius: 5px;
+}
+
+li.thumb {
+  border: 3px solid #62717b !important;
+}
+
+li.thumb.selected {
+  border: 3px solid #9ccc64 !important;
+}
