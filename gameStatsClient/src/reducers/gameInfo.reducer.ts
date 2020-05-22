@@ -10,11 +10,14 @@ export interface GameInfoState {
   twitch_box_art_url?: string | null | undefined;
   viewer_count: string | number | null;
   thumbnail_url?: string | undefined;
-  top_streamer?:
+  top_streamers?:
     | {
         viewer_count: string;
         streamer_id: string;
-      }
+        user_name: string;
+        thumbnail_url: string;
+        title: string;
+      }[]
     | undefined;
   appdetails?: gameDetails;
 }

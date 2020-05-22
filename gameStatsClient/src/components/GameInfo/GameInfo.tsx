@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
+import GameDescription from "./GameDescription";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,13 +25,16 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     isLoading: { marginTop: "20px" },
     carouselContainer: {
+      marginBottom: "25px",
       maxWidth: "90vw",
       maxHeight: "65vh",
       [theme.breakpoints.up("md")]: {
-        maxHeight: "30vh",
         maxWidth: "40vw",
       },
       backgroundColor: theme.palette.primary.dark,
+    },
+    gameDescription: {
+      maxWidth: "40vw",
     },
   })
 );
@@ -63,6 +67,11 @@ const GameInfo = () => {
       <div className={classes.carouselContainer}>
         <Carousel>{images}</Carousel>
       </div>
+      {appdetails?.detailed_description ? (
+        <div className={classes.gameDescription}>
+          <GameDescription gameDescription={appdetails?.detailed_description} />
+        </div>
+      ) : null}
     </Container>
   );
 };

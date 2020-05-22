@@ -55,7 +55,7 @@ const TopStreams = () => {
           twitch_box_art_url,
           viewer_count,
           thumbnail_url,
-          top_streamer,
+          top_streamers,
           appdetails,
         } = game;
         return (
@@ -68,7 +68,7 @@ const TopStreams = () => {
             twitch_box_art_url={twitch_box_art_url}
             viewer_count={viewer_count}
             thumbnail_url={thumbnail_url}
-            top_streamer={top_streamer}
+            top_streamers={top_streamers}
             appdetails={appdetails}
           />
         );
