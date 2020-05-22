@@ -94,67 +94,47 @@ export const getTopStreams = async (twitchAppId: string) => {
       Authorization: `Bearer ${twitchAppId}`,
       "Client-ID": TWITCH_CLIENT_ID,
     },
-    first: 100,
     json: true,
   };
 
   const topStreams: topStreamsInterface = {};
 
-  const response: { data: twitchStreamInterface[] } = await request(options);
+  const response: {
+    data: twitchStreamInterface[];
+    pagination: { cursor: string };
+  } = await request(options);
 
   for (const stream in response.data) {
     if (response.data[stream].game_id in topStreams) {
       topStreams[response.data[stream].game_id].viewer_count +=
         response.data[stream].viewer_count;
-      if (
-        response.data[stream].viewer_count >
-        topStreams[response.data[stream].game_id].top_streamer.viewer_count
-      ) {
-        topStreams[response.data[stream].game_id].top_streamer.viewer_count =
-          response.data[stream].viewer_count;
-        topStreams[response.data[stream].game_id].top_streamer.streamer_id =
-          response.data[stream].id;
-      }
+      topStreams[response.data[stream].game_id].top_streamers.push({
+        streamer_id: response.data[stream].id,
+        viewer_count: response.data[stream].viewer_count,
+        user_name: response.data[stream].user_name,
+        title: response.data[stream].title,
+        thumbnail_url: response.data[stream].thumbnail_url,
+      });
     } else {
       topStreams[response.data[stream].game_id] = {
         twitch_id: response.data[stream].game_id,
         viewer_count: response.data[stream].viewer_count,
         thumbnail_url: response.data[stream].thumbnail_url,
-        top_streamer: {
-          viewer_count: response.data[stream].viewer_count,
-          streamer_id: response.data[stream].id,
-        },
+        top_streamers: [
+          {
+            viewer_count: response.data[stream].viewer_count,
+            streamer_id: response.data[stream].id,
+            user_name: response.data[stream].user_name,
+            title: response.data[stream].title,
+            thumbnail_url: response.data[stream].thumbnail_url,
+          },
+        ],
       };
     }
   }
 
   return topStreams;
 };
-
-export interface topStreamsInterface {
-  [appid: string]: {
-    twitch_id: string;
-    viewer_count: string;
-    thumbnail_url: string;
-    top_streamer: {
-      viewer_count: string;
-      streamer_id: string;
-    };
-  };
-}
-
-export interface topStreamsWithNameInterface extends topStreamsInterface {
-  [appid: string]: {
-    twitch_id: string;
-    viewer_count: string;
-    thumbnail_url: string;
-    top_streamer: {
-      viewer_count: string;
-      streamer_id: string;
-    };
-    twitch_name: string;
-  };
-}
 
 export const getGameById = async (
   gameList: topStreamsInterface,
@@ -248,6 +228,37 @@ export const getCurrentViewers = async (
 
   return gamesWithViewCount;
 };
+
+export interface topStreamsInterface {
+  [appid: string]: {
+    twitch_id: string;
+    viewer_count: string;
+    thumbnail_url: string;
+    top_streamers: {
+      viewer_count: string;
+      streamer_id: string;
+      user_name: string;
+      thumbnail_url: string;
+      title: string;
+    }[];
+  };
+}
+
+export interface topStreamsWithNameInterface extends topStreamsInterface {
+  [appid: string]: {
+    twitch_id: string;
+    viewer_count: string;
+    thumbnail_url: string;
+    top_streamers: {
+      viewer_count: string;
+      streamer_id: string;
+      user_name: string;
+      thumbnail_url: string;
+      title: string;
+    }[];
+    twitch_name: string;
+  };
+}
 
 export interface twitchStreamInterface {
   id: string;

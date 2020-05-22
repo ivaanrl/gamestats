@@ -30,7 +30,8 @@ const getGameCurrentPlayers = async (gameAppId: number) => {
     json: true,
   };
 
-  return await request(options);
+  const response = await request(options);
+  return response;
 };
 
 export const getGamesCurrentPlayers = async (
@@ -40,7 +41,13 @@ export const getGamesCurrentPlayers = async (
     twitch_id: string;
     viewer_count: string;
     thumbnail_url: string;
-    top_streamer: { viewer_count: string; streamer_id: string };
+    top_streamers: {
+      viewer_count: string;
+      streamer_id: string;
+      user_name: string;
+      thumbnail_url: string;
+      title: string;
+    }[];
     twitch_name: string;
     appid: number;
     currentPlayers: number;
@@ -62,6 +69,7 @@ export const getGamesCurrentPlayers = async (
         if (
           Object.keys(twitchIdAndGameName).includes(game.name.toLowerCase())
         ) {
+          console.log(game.name);
           const index: string = twitchIdAndGameName[game.name.toLowerCase()];
           const gameToEdit = gameList[index];
 
@@ -79,9 +87,9 @@ export const getGamesCurrentPlayers = async (
       })
     );
   } catch (error) {
-    console.log(error);
+    console.log("error");
   }
-
+  await sleep(600);
   return gameListWithInfo;
 };
 

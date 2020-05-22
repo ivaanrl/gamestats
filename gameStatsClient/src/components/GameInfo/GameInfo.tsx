@@ -24,8 +24,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     isLoading: { marginTop: "20px" },
     carouselContainer: {
-      maxHeight: "30vh",
-      maxWidth: "40vw",
+      maxWidth: "90vw",
+      maxHeight: "65vh",
+      [theme.breakpoints.up("md")]: {
+        maxHeight: "30vh",
+        maxWidth: "40vw",
+      },
       backgroundColor: theme.palette.primary.dark,
     },
   })
