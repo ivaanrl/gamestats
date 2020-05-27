@@ -10,7 +10,6 @@ import MuiExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import MuiExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import classes from "*.module.css";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,6 +23,7 @@ const ExpansionPanel = withStyles({
   root: {
     border: "1px solid rgba(0, 0, 0, .125)",
     boxShadow: "none",
+    marginTop: "20px",
     "&:not(:last-child)": {
       borderBottom: 0,
     },
@@ -42,6 +42,7 @@ const ExpansionPanelSummary = withStyles({
     backgroundColor: "rgba(0, 0, 0, .03)",
     borderBottom: "1px solid rgba(0, 0, 0, .125)",
     marginBottom: -1,
+    marginTop: "30px",
     minHeight: 56,
     "&$expanded": {
       minHeight: 56,

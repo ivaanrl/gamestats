@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: "25px",
       maxWidth: "90vw",
       maxHeight: "65vh",
-      [theme.breakpoints.up("md")]: {
+      [theme.breakpoints.up("lg")]: {
         maxWidth: "40vw",
       },
       backgroundColor: theme.palette.primary.dark,
@@ -40,7 +40,28 @@ const useStyles = makeStyles((theme: Theme) =>
         maxWidth: "40vw",
       },
     },
-    topStreamers: {},
+    carouselAndStreamersContainer: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      justifyContent: "flex-end",
+      [theme.breakpoints.up("lg")]: {
+        flexDirection: "row",
+      },
+    },
+    topStreamers: {
+      [theme.breakpoints.up("lg")]: {
+        marginLeft: "25px",
+      },
+      maxHeight: "59vh",
+      overflowY: "scroll",
+      scrollbarWidth: "none",
+      msOverflowStyle: "none",
+      "&::-webkit-scrollbar": {
+        width: "0",
+        height: "0",
+      },
+    },
   })
 );
 
@@ -69,17 +90,20 @@ const GameInfo = () => {
       <Typography variant="h4" color="secondary">
         {name}
       </Typography>
-      <div className={classes.carouselContainer}>
-        <Carousel>{images}</Carousel>
+      <div className={classes.carouselAndStreamersContainer}>
+        <div className={classes.carouselContainer}>
+          <Carousel>{images}</Carousel>
+        </div>
+
+        {top_streamers ? (
+          <div className={classes.topStreamers}>
+            <GameActiveStreams topStreams={top_streamers} />
+          </div>
+        ) : null}
       </div>
       {appdetails?.detailed_description ? (
         <div className={classes.gameDescription}>
           <GameDescription gameDescription={appdetails?.detailed_description} />
-        </div>
-      ) : null}
-      {top_streamers ? (
-        <div className={classes.topStreamers}>
-          <GameActiveStreams topStreams={top_streamers} />
         </div>
       ) : null}
     </Container>
