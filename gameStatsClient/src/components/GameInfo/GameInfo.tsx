@@ -12,6 +12,7 @@ import {
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import GameDescription from "./GameDescription";
+import GameActiveStreams from "./GameActiveStreams";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,8 +35,12 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: theme.palette.primary.dark,
     },
     gameDescription: {
-      maxWidth: "40vw",
+      maxWidth: "80vw",
+      [theme.breakpoints.up("md")]: {
+        maxWidth: "40vw",
+      },
     },
+    topStreamers: {},
   })
 );
 
@@ -43,7 +48,7 @@ const GameInfo = () => {
   const classes = useStyles();
   const game = useSelector((state: State) => state.gameInfo);
 
-  const { name, appdetails } = game;
+  const { name, appdetails, top_streamers } = game;
 
   const images: JSX.Element[] = [];
 
@@ -70,6 +75,11 @@ const GameInfo = () => {
       {appdetails?.detailed_description ? (
         <div className={classes.gameDescription}>
           <GameDescription gameDescription={appdetails?.detailed_description} />
+        </div>
+      ) : null}
+      {top_streamers ? (
+        <div className={classes.topStreamers}>
+          <GameActiveStreams topStreams={top_streamers} />
         </div>
       ) : null}
     </Container>
